@@ -1,0 +1,35 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import re
+import nltk
+import string
+from nltk.corpus import stopwords
+from nltk.stem import LancasterStemmer
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import MultinomialNB
+train_path = "/kaggle/input/genre-classification-dataset-imdb/Genre Classification Dataset/train_data.txt"
+train_data = pd.read_csv(train_path, sep=':::', names=['Title', 'Genre', 'Description'], engine='python'
+print(train_data.describe())
+print(train_data.isnull().sum())
+test_path = "/kaggle/input/genre-classification-dataset-imdb/Genre Classification Dataset/test_data.txt"
+test_data = pd.read_csv(test_path, sep=':::', names=['Id', 'Title', 'Description'], engine='python')
+test_data.head()
+plt.figure(figsize=(14, 7))
+sns.countplot(data=train_data, y='Genre', order=train_data['Genre'].value_counts().index, palette='viridis')
+plt.xlabel('Count', fontsize=14, fontweight='bold')
+plt.ylabel('Genre', fontsize=14, fontweight='bold')
+
+# Plot the distribution of genres using a bar plot
+plt.figure(figsize=(14, 7))
+counts = train_data['Genre'].value_counts()
+sns.barplot(x=counts.index, y=counts, palette='viridis')
+plt.xlabel('Genre', fontsize=14, fontweight='bold')
+plt.ylabel('Count', fontsize=14, fontweight='bold')
+plt.title('Distribution of Genres', fontsize=16, fontweight='bold')
+plt.xticks(rotation=90, fontsize=14, fontweight='bold')
+plt.show()
+test_data.to_csv('predicted_genres.csv', index=False)
+
+# Display the 'test_data' DataFrame with predicted genres
+print(test_data)
