@@ -1,0 +1,60 @@
+import pandas as pd
+import numpy as np
+import os
+for dirname, _, filenames in os.walk('/kaggle/input'):
+    for filename in filenames:
+        print(os.path.join(dirname, filename))
+bank = pd.read_csv('/kaggle/input/bank-customer-churn-prediction/Churn_Modelling.csv')
+bank.head()
+bank.info()
+bank.describe()
+bank.isnull().sum()
+bank.duplicated()
+bank.drop(['CustomerId','RowNumber','Surname'],axis=1,inplace=True)
+bank.head()
+import seaborn as sns
+import matplotlib.pyplot as plt
+plt.figure(figsize=(15,8))
+sns.boxplot(data=bank)
+plt.show()
+sns.countplot(data=bank,x='Exited')
+sns.countplot(data=bank,x='IsActiveMember')
+sns.countplot(data=bank,x='HasCrCard')
+sns.countplot(data=bank,x='Gender')
+sns.countplot(data=bank,x='Geography')
+sns.countplot(data=bank,x='NumOfProducts')
+#Now doing Upsampling
+
+#class_1_upsampled = resample(class_1, replace=True, n_samples=len(class_0), random_state=42)
+
+#upsampled_data = pd.concat([class_0, class_1_upsampled])
+from sklearn.preprocessing import LabelEncoder
+
+le=LabelEncoder()
+bank['Gender']=le.fit_transform(bank['Gender'])
+bank['Geography']=le.fit_transform(bank['Geography'])
+
+bank.head()
+correlation = bank.corr()
+plt.figure(figsize=(10, 8))
+sns.heatmap(correlation, annot=True, cmap='coolwarm', fmt=".2f", linewidths=.5)
+plt.title('Correlation Heatmap')
+plt.show()
+bank.nunique()
+from sklearn.feature_selection import mutual_info_classif
+x = bank.drop('Exited', axis=1)
+y = bank['Exited']
+
+mutual_info_scores = mutual_info_classif(x, y)
+
+feature_info = pd.DataFrame({'Feature': x.columns, 'Mutual_Info_Score': mutual_info_scores})
+plt.figure(figsize = (12,6))
+sns.barplot(x='Mutual_Info_Score', y='Feature', data=feature_info, color='teal')
+plt.title('Mutual Information Scores for Features')
+plt.xlabel('Mutual Information Score')
+plt.ylabel('Feature')
+plt.show()
+sorted_features = feature_info.sort_values(by='Mutual_Info_Score', ascending=False)
+top_features = sorted_features.head(6)
+print(top_features)
+
